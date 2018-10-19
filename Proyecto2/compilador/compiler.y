@@ -23,7 +23,7 @@
     void encondig_instruccion1(std::string op,std::string rt,std::string rs,std::string imme);
     void encondig_instruccion2(std::string op,std::string rt,std::string rs,std::string tag);
     void encondig_instruccion3(std::string op,std::string rt,std::string rs,std::string imme);
-    void encondig_instruccion4(std::string op,std::string tag);
+    void encondig_instruccion4(std::string op,std::string rt,std::string imme);
     std::string regtobin(std::string regis);
     std::string immtobin(std::string in,int type);
     void procces_label(std::string tag,std::string g,int type);
@@ -65,7 +65,7 @@ instruction : operation reg ',' reg ',' reg {encondig_instruccion($1,$2,$4,$6);}
             | operation reg ',' reg ',' imm {encondig_instruccion1($1,$2,$4,$6);}
             | operation reg ',' reg ',' labe {encondig_instruccion2($1,$2,$4,$6);}
             | operation reg ',' imm  '(' reg ')' {encondig_instruccion3($1,$2,$6,$4);}
-            | operation reg ',' imm {printt($1);}
+            | operation reg ',' imm {encondig_instruccion4($1,$2,$4);}
             ;
 
 operation : add {;}
@@ -103,6 +103,8 @@ void encondig_instruccion(std::string op,std::string rd,std::string rs,std::stri
     binIns+=regtobin(rd);
     binIns+="00000100010";
     fs<<binIns<<'\n';
+  }else{
+    yyerror("Error: instruccion no reconocida");
   }
 }
 
@@ -129,7 +131,10 @@ void encondig_instruccion1(std::string op,std::string rt,std::string rs,std::str
     binIns+=regtobin(rt);
     binIns+="00000100010";
     fs<<binIns<<'\n';
+  }else{
+    yyerror("Error: instruccion no reconocida");
   }
+
 }
 
 void encondig_instruccion2(std::string op,std::string rt,std::string rs,std::string tag){
@@ -159,6 +164,8 @@ void encondig_instruccion2(std::string op,std::string rt,std::string rs,std::str
     binIns+=regtobin(rs);
     binIns+=std::bitset<16>(result).to_string();
     fs<<binIns<<'\n';
+  }else{
+    yyerror("Error: instruccion no reconocida");
   }
 }
 
@@ -177,6 +184,22 @@ void encondig_instruccion3(std::string op,std::string rt,std::string rs,std::str
     binIns+=regtobin(rt);
     binIns+=immtobin(imme,1);
     fs<<binIns<<'\n';
+  }else{
+    yyerror("Error: instruccion no reconocida");
+  }
+}
+
+void encondig_instruccion4(std::string op,std::string rt,std::string imme){
+  std::string binIns="";
+  text_memory+=0x4;
+  if(op.compare("Lui")==0 || op.compare("LUI")==0 || op.compare("lui")==0){
+    binIns+="001111";
+    binIns+="00000";
+    binIns+=regtobin(rt);
+    binIns+=immtobin(imme,1);
+    fs<<binIns<<'\n';
+  }else{
+    yyerror("Error: instruccion no reconocida");
   }
 }
 
